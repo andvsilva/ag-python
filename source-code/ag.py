@@ -6,13 +6,17 @@ from random import randint
 import string
 import snoop
 from icecream import ic
+import os
+import sys
+import ast
+from varname import nameof
 
 class AlgoritmoGenetico():
     """
         Algoritmo genético para encontrar o x para o qual a função x^2 - 3x + 4 assume o valor máximo
     """
     #@snoop
-    def __init__(self, x_min, x_max, tam_populacao, taxa_mutacao, taxa_crossover, num_geracoes):
+    def __init__(self, x_min, x_max, tam_populacao, taxa_mutacao, taxa_crossover, num_geracoes, param_eq):
         """
             Inicializa todos os atributos da instância
         """
@@ -22,6 +26,7 @@ class AlgoritmoGenetico():
         self.taxa_mutacao = taxa_mutacao
         self.taxa_crossover = taxa_crossover
         self.num_geracoes = num_geracoes
+        self.param_eq = param_eq
         # calcula o número de bits do x_min e x_máx no formato binário com sinal
         qtd_bits_x_min = len(bin(x_min).replace('0b', '' if x_min < 0 else '+'))
         qtd_bits_x_max = len(bin(x_max).replace('0b', '' if x_max < 0 else '+'))
@@ -47,23 +52,23 @@ class AlgoritmoGenetico():
             for bit in num_bin:
                 individuo.append(bit)
     #@snoop
-    def _funcao_objetivo(self, num_bin):
+    def _funcao_objetivo(self, num_bin, param_eq):
         """
             Calcula a função objetivo utilizada para avlaiar as soluções produzidas
         """
         # converte o número binário para o formato inteiro
         num = int(''.join(num_bin), 2)
+        num_y = 0
         # calcula e retorna o resultado da função objetivo
-        #return num**2 -3*num + 4
-        return 3*num**2 +100*num -50
+        return param_eq[0]*num**2 + param_eq[1]*num_y**2 + param_eq[2]*num*num_y + param_eq[3]*num + param_eq[4]*num_y + param_eq[5]
     #@snoop
-    def avaliar(self):
+    def avaliar(self, param_eq):
         """
             Avalia as souluções produzidas, associando uma nota/avalição a cada elemento da população
         """
         self.avaliacao = []
         for individuo in self.populacao:
-            self.avaliacao.append(self._funcao_objetivo(individuo))
+            self.avaliacao.append(self._funcao_objetivo(individuo, param_eq))
     #@snoop
     def selecionar(self):
         """
@@ -142,11 +147,43 @@ class AlgoritmoGenetico():
         return max(candidatos, key=lambda elemento: elemento[1])
 #@snoop
 def main():
+    # read file with the initial conditions
+    file = open("../inputs/q1_ag.txt", "r")
+    # input arguments
+    input_args = file.read()
+    
+    # input data - dictionary
+    dict_args = ast.literal_eval(input_args)
+    
+    #please, close the file :)
+    file.close()
+    
+    param_eq = []
+    constraint_eq = []
+    
+    idx = 0
+    
+    for arg in dict_args:
+        if(idx < 6):
+            param_eq.append(dict_args[arg])
+            idx += 1
+        else:
+            constraint_eq.append(dict_args[arg])
+            
+    #print(param_eq)
+    #print(constraint_eq)
+    
     # cria uma instância do algoritmo genético com as configurações do enunciado
-    #algoritmo_genetico = AlgoritmoGenetico(-10, 10, 4, 1, 60, 6)
-    algoritmo_genetico = AlgoritmoGenetico(-20, 20, 4, 1, 60, 6)
+    algoritmo_genetico = AlgoritmoGenetico(constraint_eq[0], 
+                                           constraint_eq[1], 
+                                           constraint_eq[2],  
+                                           constraint_eq[3],  
+                                           constraint_eq[4], 
+                                           constraint_eq[5],
+                                           param_eq
+                                          )
     # realiza a avaliação da população inicial
-    algoritmo_genetico.avaliar()
+    algoritmo_genetico.avaliar(param_eq)
     # executa o algoritmo por "num_gerações"
     for i in range(algoritmo_genetico.num_geracoes):
         # imprime o resultado a cada geração, começando da população original
@@ -166,7 +203,7 @@ def main():
             nova_populacao.append(filho_2)
         # substitui a população antiga pela nova e realiza sua avaliação
         algoritmo_genetico.populacao = nova_populacao
-        algoritmo_genetico.avaliar()
+        algoritmo_genetico.avaliar(param_eq)
 
     # procura o filho mais apto dentro da população e exibe o resultado do algoritmo genético
     print( 'Resultado {}: {}'.format(i+1, algoritmo_genetico.econtrar_filho_mais_apto()) )

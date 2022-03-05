@@ -1,0 +1,14 @@
+{
+"a": 1,
+"b": 0,
+"c": 0,
+"d": 0,
+"e": 0,
+"f": 0,
+"x_min": 0,
+"x_max": 31,
+"tam_populacao": 4,
+"taxa_mutacao": 1,
+"taxa_crossover": 60,
+"num_geracoes": 5,
+}

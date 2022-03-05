@@ -64,11 +64,14 @@ class AlgoritmoGenetico():
     #@snoop
     def avaliar(self, param_eq):
         """
-            Avalia as souluções produzidas, associando uma nota/avalição a cada elemento da população
+            Avalia as soluções produzidas, associando uma nota/avalição a cada elemento da população
         """
         self.avaliacao = []
         for individuo in self.populacao:
             self.avaliacao.append(self._funcao_objetivo(individuo, param_eq))
+        #print('Avalia as souluções produzidas, associando uma nota/avalição a cada elemento da população:')
+        #print(f'{self.avaliacao}')
+        
     #@snoop
     def selecionar(self):
         """
@@ -137,7 +140,7 @@ class AlgoritmoGenetico():
         # limite mais próximo
         self._ajustar(individuo)
     #@snoop
-    def econtrar_filho_mais_apto(self):
+    def encontrar_filho_mais_apto(self):
         """
             Busca o individuo com a melhor avaliação dentro da população
         """
@@ -147,8 +150,11 @@ class AlgoritmoGenetico():
         return max(candidatos, key=lambda elemento: elemento[1])
 #@snoop
 def main():
+    
+    filename = sys.argv[1]
+    
     # read file with the initial conditions
-    file = open("../inputs/q1_ag.txt", "r")
+    file = open(f"../inputs/{filename}", "r")
     # input arguments
     input_args = file.read()
     
@@ -170,8 +176,8 @@ def main():
         else:
             constraint_eq.append(dict_args[arg])
             
-    #print(param_eq)
-    #print(constraint_eq)
+    print(f'Equation - Parameters..........:{param_eq}')
+    print(f'Equation - Constraints..........:{constraint_eq}')
     
     # cria uma instância do algoritmo genético com as configurações do enunciado
     algoritmo_genetico = AlgoritmoGenetico(constraint_eq[0], 
@@ -187,7 +193,7 @@ def main():
     # executa o algoritmo por "num_gerações"
     for i in range(algoritmo_genetico.num_geracoes):
         # imprime o resultado a cada geração, começando da população original
-        print( 'Resultado {}: {}'.format(i, algoritmo_genetico.econtrar_filho_mais_apto()) )
+        print( 'Resultado {}: {}'.format(i, algoritmo_genetico.encontrar_filho_mais_apto()) )
         # cria uma nova população e a preenche enquanto não estiver completa
         nova_populacao = []
         while len(nova_populacao) < algoritmo_genetico.tam_populacao:
@@ -206,7 +212,9 @@ def main():
         algoritmo_genetico.avaliar(param_eq)
 
     # procura o filho mais apto dentro da população e exibe o resultado do algoritmo genético
-    print( 'Resultado {}: {}'.format(i+1, algoritmo_genetico.econtrar_filho_mais_apto()) )
+    msg_avalicao ='Busca o individuo com a melhor avaliação dentro da população'
+    print(msg_avalicao)
+    print( 'Resultado {}: {}'.format(i+1, algoritmo_genetico.encontrar_filho_mais_apto()) )
 
     # encerra a execução da função main
     return 0

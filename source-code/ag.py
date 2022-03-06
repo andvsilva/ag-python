@@ -10,6 +10,7 @@ import os
 import sys
 import ast
 from varname import nameof
+import math
 
 class AlgoritmoGenetico():
     """
@@ -60,7 +61,12 @@ class AlgoritmoGenetico():
         num = int(''.join(num_bin), 2)
         num_y = 0
         # calcula e retorna o resultado da função objetivo
-        return param_eq[0]*num**2 + param_eq[1]*num_y**2 + param_eq[2]*num*num_y + param_eq[3]*num + param_eq[4]*num_y + param_eq[5]
+        
+        if all([ param == 0 for param in param_eq ]) :
+            return num*math.sin(10*math.pi*num) + 1
+        else:
+            return param_eq[0]*num**2 + param_eq[1]*num_y**2 + param_eq[2]*num*num_y + param_eq[3]*num + param_eq[4]*num_y + param_eq[5]
+         
     #@snoop
     def avaliar(self, param_eq):
         """
